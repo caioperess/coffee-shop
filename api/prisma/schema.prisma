@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum CartStatus {
+  ACTIVE
+  FINISHED
+}
+
+enum OrderStatus {
+  PENDING
+  IN_PROGRESS
+  SENT
+}
+
+model User {
+  id            String   @id @default(uuid())
+  name          String
+  email         String
+  password_hash String
+  created_at    DateTime @default(now())
+  updated_at    DateTime @default(now())
+  Cart          Cart[]
+  Order         Order[]
+
+  @@map("users")
+}
+
+model Product {
+  id          String      @id @default(uuid())
+  name        String
+  description String
+  price       Decimal
+  photo_url   String
+  created_at  DateTime    @default(now())
+  updated_at  DateTime    @default(now())
+  CartItems   CartItems[]
+
+  @@map("products")
+}
+
+model Cart {
+  id         String     @id @default(uuid())
+  status     CartStatus @default(ACTIVE)
+  created_at DateTime   @default(now())
+  updated_at DateTime   @default(now())
+  user_id    String
+
+  user      User        @relation(fields: [user_id], references: [id])
+  CartItems CartItems[]
+  Order     Order[]
+
+  @@map("carts")
+}
+
+model CartItems {
+  id         String  @id @default(uuid())
+  price      Decimal
+  quantity   Int
+  cart_id    String
+  product_id String
+
+  cart    Cart    @relation(fields: [cart_id], references: [id])
+  product Product @relation(fields: [product_id], references: [id])
+
+  @@map("cart_items")
+}
+
+model Order {
+  id          String      @id @default(uuid())
+  total_price Decimal
+  status      OrderStatus @default(PENDING)
+  created_at  DateTime    @default(now())
+  user_id     String
+  cart_id     String
+
+  user User @relation(fields: [user_id], references: [id])
+  cart Cart @relation(fields: [cart_id], references: [id])
+
+  @@map("orders")
+}

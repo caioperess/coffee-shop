@@ -1,6 +1,6 @@
 import 'reflect-metadata'
-import { app } from './app'
-import { env } from './env'
+import { app } from './app.js'
+import { env } from './env/index.js'
 
 app
 	.listen({

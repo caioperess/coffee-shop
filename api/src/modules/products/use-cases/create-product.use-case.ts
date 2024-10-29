@@ -1,6 +1,7 @@
-import type { prisma } from '@/lib/prisma'
+import type { prisma } from '@/lib/prisma.js'
 import type { Prisma } from '@prisma/client'
-import type { IProductsRepository } from '../repositories/products.repository'
+
+import type { IProductsRepository } from '../repositories/products.repository.js'
 
 type ProductCreateBody = Prisma.Args<typeof prisma.product, 'create'>['data']
 

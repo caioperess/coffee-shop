@@ -1,6 +1,6 @@
 import { Prisma, type Product } from '@prisma/client'
 import { randomUUID } from 'node:crypto'
-import type { IProductsRepository } from '../products.repository'
+import type { IProductsRepository } from '../products.repository.js'
 
 export class InMemoryProductsRepository implements IProductsRepository {
 	private readonly products: Product[] = []

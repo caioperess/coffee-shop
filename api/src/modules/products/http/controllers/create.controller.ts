@@ -1,7 +1,8 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import { container } from 'tsyringe'
 import z from 'zod'
-import { CreateProductUseCase } from '../../use-cases/create-product.use-case'
+
+import { CreateProductUseCase } from '../../use-cases/create-product.use-case.js'
 
 export async function createProductController(
 	req: FastifyRequest,
@@ -18,9 +19,9 @@ export async function createProductController(
 		req.body,
 	)
 
-	const createCarUseCase = container.resolve(CreateProductUseCase)
+	const createProductUseCase = container.resolve(CreateProductUseCase)
 
-	const product = await createCarUseCase.execute({
+	const product = await createProductUseCase.execute({
 		name,
 		description,
 		photo_url,

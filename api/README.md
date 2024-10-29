@@ -21,7 +21,6 @@ Coffee Shop
 - [ ] The user should not be able to sign up with an existent email
 - [ ] The user can't have more than 1 open cart
 
-
 ## RNFs (Requisitos não funcionais)
 
 - [x] The user password has to be encrypted

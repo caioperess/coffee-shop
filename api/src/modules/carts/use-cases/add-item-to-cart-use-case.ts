@@ -1,5 +1,6 @@
 import type { IProductsRepository } from '@/modules/products/repositories/products.repository.js'
 import { EntityNotFoundError } from '@/shared/errors/entity-not-found.js'
+import { inject, injectable } from 'tsyringe'
 import type { ICartItemsRepository } from '../repositories/cart-item.repository.js'
 import type { ICartsRepository } from '../repositories/cart.repository.js'
 
@@ -12,10 +13,14 @@ interface AddItemToCartUseCaseParams {
 	}
 }
 
+@injectable()
 export class AddItemToCartUseCase {
 	constructor(
+		@inject('cartItemsRepository')
 		private readonly cartItemsRepository: ICartItemsRepository,
+		@inject('cartsRepository')
 		private readonly cartsRepository: ICartsRepository,
+		@inject('productsRepository')
 		private readonly productsRepository: IProductsRepository,
 	) {}
 

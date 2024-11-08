@@ -1,3 +1,4 @@
+import { inject, injectable } from 'tsyringe'
 import { ItemDoesNotExistsOnCartError } from '../errors/item-not-in-cart.js'
 import { UserHasNoCartError } from '../errors/user-has-no-cart.js'
 import type { ICartItemsRepository } from '../repositories/cart-item.repository.js'
@@ -8,9 +9,12 @@ interface RemoveItemFromCartUseCaseParams {
 	itemId: string
 }
 
+@injectable()
 export class RemoveItemFromCartUseCase {
 	constructor(
+		@inject('cartItemsRepository')
 		private readonly cartItemsRepository: ICartItemsRepository,
+		@inject('cartsRepository')
 		private readonly cartsRepository: ICartsRepository,
 	) {}
 

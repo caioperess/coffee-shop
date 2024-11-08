@@ -15,7 +15,7 @@ datasource db {
 
 enum CartStatus {
   ACTIVE
-  FINISHED
+  CHECKOUT
 }
 
 enum OrderStatus {
@@ -27,7 +27,7 @@ enum OrderStatus {
 model User {
   id            String   @id @default(uuid())
   name          String
-  email         String
+  email         String   @unique
   password_hash String
   created_at    DateTime @default(now())
   updated_at    DateTime @default(now())

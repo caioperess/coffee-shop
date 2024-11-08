@@ -4,7 +4,7 @@ import z from 'zod'
 
 import { CreateProductUseCase } from '../../use-cases/create-product.use-case.js'
 
-export async function createProductController(
+export async function CreateProductController(
 	req: FastifyRequest,
 	reply: FastifyReply,
 ) {
@@ -21,12 +21,12 @@ export async function createProductController(
 
 	const createProductUseCase = container.resolve(CreateProductUseCase)
 
-	const product = await createProductUseCase.execute({
+	await createProductUseCase.execute({
 		name,
 		description,
 		photo_url,
 		price,
 	})
 
-	return reply.status(201).send(product)
+	return reply.status(201).send()
 }

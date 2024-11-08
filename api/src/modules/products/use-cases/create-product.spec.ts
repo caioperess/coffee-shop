@@ -11,7 +11,7 @@ describe('Create Product Use Case', () => {
 	})
 
 	it('should be able to create a new product', async () => {
-		const product = await sut.execute({
+		const { product } = await sut.execute({
 			name: 'Product 1',
 			description: 'Description 1',
 			photo_url: 'https://example.com/photo1.jpg',

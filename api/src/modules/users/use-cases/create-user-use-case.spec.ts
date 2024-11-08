@@ -1,18 +1,23 @@
-import { compare } from 'bcrypt'
+import { BcryptHashProvider } from '@/shared/providers/hash/implementations/bcrypt.js'
+import type { IHashProvider } from '@/shared/providers/hash/index.js'
+import { UserAlreadyExistsError } from '../errors/user-already-exists.js'
 import { InMemoryUsersRepository } from '../repositories/in-memory/in-memory-users.repository.js'
-import { CreateUserUseCase } from './create-user.use-case.js'
+import type { IUsersRepository } from '../repositories/users.repository.js'
+import { CreateUserUseCase } from './create-user-use-case.js'
 
-let usersRepository: InMemoryUsersRepository
+let hashProvider: IHashProvider
+let usersRepository: IUsersRepository
 let sut: CreateUserUseCase
 
 describe('Create User Use Case', () => {
 	beforeEach(() => {
+		hashProvider = new BcryptHashProvider()
 		usersRepository = new InMemoryUsersRepository()
-		sut = new CreateUserUseCase(usersRepository)
+		sut = new CreateUserUseCase(usersRepository, hashProvider)
 	})
 
 	it('should be able to create a new user', async () => {
-		const user = await sut.execute({
+		const { user } = await sut.execute({
 			name: 'John Doe',
 			email: 'email@test.com',
 			password: '123456',
@@ -23,13 +28,13 @@ describe('Create User Use Case', () => {
 	})
 
 	it('should hash user password upon registration', async () => {
-		const user = await sut.execute({
+		const { user } = await sut.execute({
 			name: 'John Doe',
 			email: 'email@test.com',
 			password: '123456',
 		})
 
-		const isPasswordCorrectlyHashed = await compare(
+		const isPasswordCorrectlyHashed = await hashProvider.compare(
 			'123456',
 			user.password_hash,
 		)
@@ -50,6 +55,6 @@ describe('Create User Use Case', () => {
 				email: 'email@test.com',
 				password: '123456',
 			}),
-		).rejects.toBeInstanceOf(Error)
+		).rejects.toBeInstanceOf(UserAlreadyExistsError)
 	})
 })

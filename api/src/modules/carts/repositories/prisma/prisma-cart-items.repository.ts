@@ -35,7 +35,7 @@ export class PrismaCartItemsRepository implements ICartItemsRepository {
 		itemId: string,
 	): Promise<CartItems | null> {
 		const cartItem = await prisma.cartItems.findFirst({
-			where: { cart_id: cartId, id: itemId },
+			where: { cart_id: cartId, product_id: itemId },
 		})
 
 		return cartItem

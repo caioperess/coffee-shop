@@ -1,5 +1,7 @@
-export class CartAlreadyCheckoutError extends Error {
+import { CustomError } from '@/shared/errors/index.js'
+
+export class CartAlreadyCheckoutError extends CustomError {
 	constructor() {
-		super('Cart already checkout')
+		super('Cart already checkout', 400)
 	}
 }

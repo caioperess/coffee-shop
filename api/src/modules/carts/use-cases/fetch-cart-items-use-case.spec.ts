@@ -28,7 +28,7 @@ describe('Fetch Cart Items Use Case', () => {
 
 		const { cart: cartWithItems } = await sut.execute({ userId: 'user-1' })
 
-		expect(cartWithItems).toHaveLength(1)
+		expect(cartWithItems.CartItems).toHaveLength(1)
 		expect(cartWithItems.CartItems[0].id).toEqual('cart-item-1')
 	})
 

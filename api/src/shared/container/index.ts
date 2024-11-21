@@ -2,9 +2,7 @@ import './providers.js'
 
 import { container } from 'tsyringe'
 
-import type { ICartItemsRepository } from '@/modules/carts/repositories/cart-item.repository.js'
 import type { ICartsRepository } from '@/modules/carts/repositories/cart.repository.js'
-import { PrismaCartItemsRepository } from '@/modules/carts/repositories/prisma/prisma-cart-items.repository.js'
 import { PrismaCartsRepository } from '@/modules/carts/repositories/prisma/prisma-cart.repository.js'
 import type { ICheckoutsRepository } from '@/modules/checkouts/repositories/checkout.repository.js'
 import { PrismaCheckoutsRepository } from '@/modules/checkouts/repositories/prisma/prisma-checkout.repository.js'
@@ -26,11 +24,6 @@ container.registerSingleton<IUsersRepository>(
 container.registerSingleton<ICartsRepository>(
 	'cartsRepository',
 	PrismaCartsRepository,
-)
-
-container.registerSingleton<ICartItemsRepository>(
-	'cartItemsRepository',
-	PrismaCartItemsRepository,
 )
 
 container.registerSingleton<ICheckoutsRepository>(

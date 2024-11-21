@@ -1,7 +1,6 @@
 import type { IProductsRepository } from '@/modules/products/repositories/products.repository.js'
 import { EntityNotFoundError } from '@/shared/errors/entity-not-found.js'
 import { inject, injectable } from 'tsyringe'
-import type { ICartItemsRepository } from '../repositories/cart-item.repository.js'
 import type { ICartsRepository } from '../repositories/cart.repository.js'
 
 interface AddItemToCartUseCaseParams {
@@ -16,8 +15,6 @@ interface AddItemToCartUseCaseParams {
 @injectable()
 export class AddItemToCartUseCase {
 	constructor(
-		@inject('cartItemsRepository')
-		private readonly cartItemsRepository: ICartItemsRepository,
 		@inject('cartsRepository')
 		private readonly cartsRepository: ICartsRepository,
 		@inject('productsRepository')
@@ -37,18 +34,17 @@ export class AddItemToCartUseCase {
 			cart = await this.cartsRepository.create({ user_id: userId })
 		}
 
-		const doesItemAlreadyAdded =
-			await this.cartItemsRepository.findByCartIdAndItemId(cart.id, item.id)
+		const cartItem = await this.cartsRepository.findItemByIdAndCartId(
+			item.id,
+			cart.id,
+		)
 
-		if (doesItemAlreadyAdded) {
-			const updatedItemQuantity = {
-				...doesItemAlreadyAdded,
-				quantity: doesItemAlreadyAdded.quantity + item.quantity,
-			}
+		if (cartItem) {
+			const newQuantity = cartItem.quantity + item.quantity
 
-			await this.cartItemsRepository.save(updatedItemQuantity)
+			await this.cartsRepository.updateItemQuantity(cartItem.id, newQuantity)
 		} else {
-			await this.cartItemsRepository.create({
+			await this.cartsRepository.addItem({
 				price: item.price,
 				quantity: item.quantity,
 				cart_id: cart.id,

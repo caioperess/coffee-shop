@@ -6,7 +6,6 @@ import type { ICheckoutsRepository } from '../repositories/checkout.repository.j
 interface CheckoutUseCaseParams {
 	userId: string
 	cartId: string
-	totalPrice: number
 }
 
 @injectable()
@@ -18,12 +17,17 @@ export class CheckoutUseCase {
 		private readonly cartsRepository: ICartsRepository,
 	) {}
 
-	async execute({ cartId, userId, totalPrice }: CheckoutUseCaseParams) {
+	async execute({ cartId, userId }: CheckoutUseCaseParams) {
 		const cart = await this.cartsRepository.findById(cartId)
 
 		if (!cart) {
 			throw new CartNotFoundError()
 		}
+
+		const totalPrice = cart.CartItems.reduce(
+			(acc, item) => acc + Number(item.price) * item.quantity,
+			0,
+		)
 
 		await this.cartsRepository.checkout(cartId)
 		const checkout = await this.checkoutsRepository.create({

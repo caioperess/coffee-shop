@@ -1,20 +1,16 @@
 import { ItemDoesNotExistsOnCartError } from '../errors/item-not-in-cart.js'
 import { UserHasNoCartError } from '../errors/user-has-no-cart.js'
-import type { ICartItemsRepository } from '../repositories/cart-item.repository.js'
 import type { ICartsRepository } from '../repositories/cart.repository.js'
-import { InMemoryCartItemsRepository } from '../repositories/in-memory/in-memory-cart-item.repository.js'
 import { InMemoryCartRepository } from '../repositories/in-memory/in-memory-cart.repository.js'
 import { RemoveItemFromCartUseCase } from './remove-item-from-cart-use-case.js'
 
-let cartItemsRepository: ICartItemsRepository
 let cartsRepository: ICartsRepository
 let sut: RemoveItemFromCartUseCase
 
 describe('Remove Item from Cart Use Case', () => {
 	beforeEach(() => {
-		cartItemsRepository = new InMemoryCartItemsRepository()
 		cartsRepository = new InMemoryCartRepository()
-		sut = new RemoveItemFromCartUseCase(cartItemsRepository, cartsRepository)
+		sut = new RemoveItemFromCartUseCase(cartsRepository)
 	})
 
 	it('should be able to remove an item from cart', async () => {
@@ -23,7 +19,7 @@ describe('Remove Item from Cart Use Case', () => {
 			user_id: 'user-1',
 		})
 
-		const cartItem = await cartItemsRepository.create({
+		const cartItem = await cartsRepository.addItem({
 			id: 'cart-item-1',
 			price: 10,
 			quantity: 1,
@@ -33,9 +29,9 @@ describe('Remove Item from Cart Use Case', () => {
 
 		await sut.execute({ userId: 'user-1', itemId: cartItem.id })
 
-		const cartItems = await cartItemsRepository.findManyByCartId(cart.id)
+		const cartWithItems = await cartsRepository.findById(cart.id)
 
-		expect(cartItems).toHaveLength(0)
+		expect(cartWithItems?.CartItems).toHaveLength(0)
 	})
 
 	it('should not be able to remove an item from cart if cart does not exists', async () => {

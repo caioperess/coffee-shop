@@ -1,5 +1,6 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import { container } from 'tsyringe'
+
 import { FetchCartItemsUseCase } from '../../use-cases/fetch-cart-items-use-case.js'
 
 export async function FetchCartItemController(
@@ -10,7 +11,12 @@ export async function FetchCartItemController(
 
 	const fetchCartItemsUseCase = container.resolve(FetchCartItemsUseCase)
 
-	const { cartItems } = await fetchCartItemsUseCase.execute({ userId })
+	const { cart } = await fetchCartItemsUseCase.execute({ userId })
 
-	reply.status(200).send({ cartItems })
+	reply.status(200).send({
+		cart: {
+			id: cart.id,
+			items: cart.CartItems,
+		},
+	})
 }

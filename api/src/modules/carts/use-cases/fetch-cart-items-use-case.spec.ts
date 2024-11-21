@@ -1,18 +1,15 @@
-import type { ICartItemsRepository } from '../repositories/cart-item.repository.js'
+import { UserHasNoCartError } from '../errors/user-has-no-cart.js'
 import type { ICartsRepository } from '../repositories/cart.repository.js'
-import { InMemoryCartItemsRepository } from '../repositories/in-memory/in-memory-cart-item.repository.js'
 import { InMemoryCartRepository } from '../repositories/in-memory/in-memory-cart.repository.js'
 import { FetchCartItemsUseCase } from './fetch-cart-items-use-case.js'
 
-let cartItemsRepository: ICartItemsRepository
 let cartsRepository: ICartsRepository
 let sut: FetchCartItemsUseCase
 
 describe('Fetch Cart Items Use Case', () => {
 	beforeEach(() => {
-		cartItemsRepository = new InMemoryCartItemsRepository()
 		cartsRepository = new InMemoryCartRepository()
-		sut = new FetchCartItemsUseCase(cartItemsRepository, cartsRepository)
+		sut = new FetchCartItemsUseCase(cartsRepository)
 	})
 
 	it('should be able to fetch cart items', async () => {
@@ -21,7 +18,7 @@ describe('Fetch Cart Items Use Case', () => {
 			user_id: 'user-1',
 		})
 
-		await cartItemsRepository.create({
+		await cartsRepository.addItem({
 			id: 'cart-item-1',
 			price: 10,
 			quantity: 1,
@@ -29,15 +26,15 @@ describe('Fetch Cart Items Use Case', () => {
 			product_id: 'product-1',
 		})
 
-		const { cartItems } = await sut.execute({ userId: 'user-1' })
+		const { cart: cartWithItems } = await sut.execute({ userId: 'user-1' })
 
-		expect(cartItems).toHaveLength(1)
-		expect(cartItems[0].id).toEqual('cart-item-1')
+		expect(cartWithItems).toHaveLength(1)
+		expect(cartWithItems.CartItems[0].id).toEqual('cart-item-1')
 	})
 
-	it('should return an empty array if user does not have an active cart', async () => {
-		const { cartItems } = await sut.execute({ userId: 'user-1' })
-
-		expect(cartItems).toHaveLength(0)
+	it('should return error if user has no active cart', async () => {
+		await expect(() =>
+			sut.execute({ userId: 'user-1' }),
+		).rejects.toBeInstanceOf(UserHasNoCartError)
 	})
 })

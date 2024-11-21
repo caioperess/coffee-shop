@@ -2,27 +2,21 @@ import { InMemoryProductsRepository } from '@/modules/products/repositories/in-m
 import type { IProductsRepository } from '@/modules/products/repositories/products.repository.js'
 import { EntityNotFoundError } from '@/shared/errors/entity-not-found.js'
 import { CartStatus } from '@prisma/client'
-import type { ICartItemsRepository } from '../repositories/cart-item.repository.js'
+
 import type { ICartsRepository } from '../repositories/cart.repository.js'
-import { InMemoryCartItemsRepository } from '../repositories/in-memory/in-memory-cart-item.repository.js'
+
 import { InMemoryCartRepository } from '../repositories/in-memory/in-memory-cart.repository.js'
 import { AddItemToCartUseCase } from './add-item-to-cart-use-case.js'
 
-let cartItemsRepository: ICartItemsRepository
 let cartsRepository: ICartsRepository
 let productsRepository: IProductsRepository
 let sut: AddItemToCartUseCase
 
 describe('Add Item to Cart Use Case', () => {
 	beforeEach(() => {
-		cartItemsRepository = new InMemoryCartItemsRepository()
 		cartsRepository = new InMemoryCartRepository()
 		productsRepository = new InMemoryProductsRepository()
-		sut = new AddItemToCartUseCase(
-			cartItemsRepository,
-			cartsRepository,
-			productsRepository,
-		)
+		sut = new AddItemToCartUseCase(cartsRepository, productsRepository)
 	})
 
 	it('should be able to add an item to cart', async () => {
@@ -44,11 +38,9 @@ describe('Add Item to Cart Use Case', () => {
 
 		const cart = await cartsRepository.findActiveCartByUserId('user-1')
 
-		const cartItems = await cartItemsRepository.findManyByCartId(cart?.id ?? '')
-
-		expect(cartItems).toHaveLength(1)
-		expect(cartItems[0].product_id).toEqual(product.id)
-		expect(cartItems[0].quantity).toEqual(1)
+		expect(cart?.CartItems).toHaveLength(1)
+		expect(cart?.CartItems[0].product_id).toEqual(product.id)
+		expect(cart?.CartItems[0].quantity).toEqual(1)
 	})
 
 	it('should be able to update an item quantity if item already exists in cart', async () => {
@@ -79,11 +71,9 @@ describe('Add Item to Cart Use Case', () => {
 
 		const cart = await cartsRepository.findActiveCartByUserId('user-1')
 
-		const cartItems = await cartItemsRepository.findManyByCartId(cart?.id ?? '')
-
-		expect(cartItems).toHaveLength(1)
-		expect(cartItems[0].product_id).toEqual(product.id)
-		expect(cartItems[0].quantity).toEqual(5)
+		expect(cart?.CartItems).toHaveLength(1)
+		expect(cart?.CartItems[0].product_id).toEqual(product.id)
+		expect(cart?.CartItems[0].quantity).toEqual(5)
 	})
 
 	it('should not be able to add an item to cart if product does not exists', async () => {

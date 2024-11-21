@@ -1,6 +1,6 @@
-import type { CartItems } from '@prisma/client'
 import { inject, injectable } from 'tsyringe'
-import type { ICartItemsRepository } from '../repositories/cart-item.repository.js'
+import type { ICartWithItemsDAO } from '../dtos/cart-with-items-dao.js'
+import { UserHasNoCartError } from '../errors/user-has-no-cart.js'
 import type { ICartsRepository } from '../repositories/cart.repository.js'
 
 interface FetchCartItemsUseCaseParams {
@@ -8,14 +8,12 @@ interface FetchCartItemsUseCaseParams {
 }
 
 interface FetchCartItemsUseCaseResponse {
-	cartItems: CartItems[]
+	cart: ICartWithItemsDAO
 }
 
 @injectable()
 export class FetchCartItemsUseCase {
 	constructor(
-		@inject('cartItemsRepository')
-		private readonly cartsItemsRepository: ICartItemsRepository,
 		@inject('cartsRepository')
 		private readonly cartsRepository: ICartsRepository,
 	) {}
@@ -26,11 +24,9 @@ export class FetchCartItemsUseCase {
 		const cart = await this.cartsRepository.findActiveCartByUserId(userId)
 
 		if (!cart) {
-			return { cartItems: [] }
+			throw new UserHasNoCartError()
 		}
 
-		const cartItems = await this.cartsItemsRepository.findManyByCartId(cart.id)
-
-		return { cartItems }
+		return { cart }
 	}
 }
